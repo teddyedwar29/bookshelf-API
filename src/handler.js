@@ -82,14 +82,18 @@ const getAllBookHandler = (request,h) => {
         filteredBooks = filteredBooks.filter((book) => book.finished === isFinished);
     }
 
-    
+    const responseBooks = filteredBooks.map((book) => ({
+        id: book.id,
+        name: book.name,
+        publisher: book.publisher
+    }));
 
     return h.response({
         status: 'success',
         data: {
-            books,
+            books: responseBooks,
         }
-    });
+    }).code(200);
 }
 
 const getBookByIdHandler = (request,h) => {
@@ -127,7 +131,7 @@ const updateBookHandler = (request, h) => {
     if (bookIndex === -1) {
         return h.response({
             status: 'fail',
-            message: 'Buku tidak ditemukan'
+            message: 'Gagal memperbarui buku. Id tidak ditemukan'
         }).code(404);
     }
 
@@ -143,7 +147,7 @@ const updateBookHandler = (request, h) => {
     if (readPage > pageCount) {
         const response = h.response({
             status: 'fail',
-            message: 'Gagal memperbarui buku. readPage tidak boleh lebih besar dar pageCount',
+            message: 'Gagal memperbarui buku. readPage tidak boleh lebih besar dari pageCount',
         });
         response.code(400);
         return response;
@@ -182,7 +186,7 @@ const deleteBookHandler = (request,h) => {
         return h.response({
             status: 'fail',
             message: 'Buku gagal dihapus. Id tidak ditemukan'
-        });
+        }).code(404);
     }
     books.splice(bookIndex,1);
     return h.response({
